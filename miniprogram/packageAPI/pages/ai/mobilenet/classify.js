@@ -1044,48 +1044,50 @@ export class Classifier {
        const modelPath = `${wx.env.USER_DATA_PATH}/mobilenetv2-12.onnx`;
 
        // 判断之前是否已经下载过onnx模型
-        wx.getFileSystemManager().access({
-          path: modelPath,
-          success: (res) =>
-          {
-            console.log("file already exist at: " + modelPath)
-              this.createInferenceSession(modelPath).then(() =>
-              {
-                resolve();
-              })
-          },
-          fail: (res) => {
-            console.error(res)
+        // wx.getFileSystemManager().access({
+        //   path: modelPath,
+        //   success: (res) =>
+        //   {
+        //     console.log("file already exist at: " + modelPath)
+        //       this.createInferenceSession(modelPath).then(() =>
+        //       {
+        //         resolve();
+        //       })
+        //   },
+        //   fail: (res) => {
+        //     console.error(res)
 
             wx.cloud.init();
             console.log("begin download model");
 
             const cloudPath = 'cloud://containertest-0gmw3ulnd8d9bc7b.636f-containertest-0gmw3ulnd8d9bc7b-1258211818/mobilenetv2-12.onnx'
-            this.downloadFile(cloudPath, function(r) {
+            this.downloadFile("https://act-1251001122.cos.ap-shanghai.myqcloud.com/test/mobilenetv2-12.onnx", function(r) {
               console.log(`下载进度：${r.progress}%，已下载${r.totalBytesWritten}B，共${r.totalBytesExpectedToWrite}B`)
             }).then(result => {
-        
-              wx.getFileSystemManager().saveFile({
-                tempFilePath:result.tempFilePath,
-                filePath: modelPath,
-                success: (res) => { // 注册回调函数
-                  console.log(res)
-                  // const modelPath = res.savedFilePath +'/mobilenetv2-12.onnx'
-    
-                  const modelPath = res.savedFilePath;
-                  console.log("save onnx model at path: " + modelPath)
 
-                  this.createInferenceSession(modelPath).then(() => {
-                    resolve();
-                  })
-                },
-                fail(res) {
-                  console.error(res)
-                  return
-                }
+              this.createInferenceSession(`${wx.env.USER_DATA_PATH}/mobilenetv2.onnx`).then(() => {
+                resolve();
               })
-        });
-          }
+        
+              // wx.getFileSystemManager().saveFile({
+              //   tempFilePath:result.tempFilePath,
+              //   filePath: modelPath,
+              //   success: (res) => { // 注册回调函数
+              //     console.log(res)
+              //     // const modelPath = res.savedFilePath +'/mobilenetv2-12.onnx'
+    
+              //     const modelPath = res.savedFilePath;
+              //     console.log("save onnx model at path: " + modelPath)
+
+                  
+              //   },
+              //   fail(res) {
+              //     console.error(res)
+              //     return
+              //   }
+              // })
+    //     });
+    //       }
         })
     })
   }
@@ -1121,8 +1123,9 @@ export class Classifier {
 
   downloadFile(fileID, onCall = () => {}) {
     return new Promise((resolve, reject) => {
-      const task = wx.cloud.downloadFile({
-        fileID,
+      const task = wx.downloadFile({
+        url:fileID,
+        filePath: `${wx.env.USER_DATA_PATH}/mobilenetv2.onnx`,
         success: res => resolve(res),
         fail: e => {
           const info = e.toString()
