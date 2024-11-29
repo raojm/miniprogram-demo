@@ -1061,7 +1061,7 @@ export class Classifier {
             console.log("begin download model");
 
             const cloudPath = 'cloud://containertest-0gmw3ulnd8d9bc7b.636f-containertest-0gmw3ulnd8d9bc7b-1258211818/mobilenetv2-12.onnx'
-            this.downloadFile("https://act-1251001122.cos.ap-shanghai.myqcloud.com/test/mobilenetv2-12.onnx", function(r) {
+            this.downloadFile("https://act-1251001122.cos.ap-shanghai.myqcloud.com/test/offline_model.onnx", function(r) {
               console.log(`下载进度：${r.progress}%，已下载${r.totalBytesWritten}B，共${r.totalBytesExpectedToWrite}B`)
             }).then(result => {
 
@@ -1111,11 +1111,12 @@ export class Classifier {
 
       // 监听error事件
       this.session.onError((error) => {
-        console.error(error);
+        console.error("createInferenceSession error:" + error);
         reject(error);
       });
       this.session.onLoad(() => {
         this.ready = true;
+        console.error(`reateInferenceSession ${modelPath} success.`);
         resolve();
       });
     })
